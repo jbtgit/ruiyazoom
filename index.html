@@ -26,6 +26,7 @@
       background: radial-gradient(1200px 800px at 80% -10%, #19306b33, transparent 50%), var(--bg);
       color:var(--text);
       display:flex; flex-direction:column; gap:24px;
+      
     }
     header{
       padding:24px clamp(16px, 4vw, 48px) 0;
@@ -74,6 +75,7 @@
     <div class="title">
       <h1>🕒 Reloj RuiyaParty Deeeeeeeeee</h1>
     </div>
+
     <div class="controls">
       <span class="chip" id="localLabel">Tu zona horaria: —</span>
       <span class="chip" id="localNow">—</span>
@@ -100,16 +102,13 @@ Passcode: 1d3dET<br/>
       { name: "Ciudad de México", country:"México", flag:"🇲🇽", tz:"America/Mexico_City" },
       { name: "Bogotá", country:"Colombia", flag:"🇨🇴", tz:"America/Bogota" },
       { name: "Buenos Aires", country:"Argentina", flag:"🇦🇷", tz:"America/Argentina/Buenos_Aires" },
+      { name: "Santiago", country:"Chile", flag:"🇨🇱", tz:"America/Santiago" },
       { name: "São Paulo", country:"Brasil", flag:"🇧🇷", tz:"America/Sao_Paulo" },
       { name: "Nueva York", country:"EE. UU.", flag:"🇺🇸", tz:"America/New_York" },
       { name: "Los Ángeles", country:"EE. UU.", flag:"🇺🇸", tz:"America/Los_Angeles" },
       { name: "Londres", country:"Reino Unido", flag:"🇬🇧", tz:"Europe/London" },
       { name: "Madrid", country:"España", flag:"🇪🇸", tz:"Europe/Madrid" },
       { name: "París", country:"Francia", flag:"🇫🇷", tz:"Europe/Paris" },
-      { name: "Berlín", country:"Alemania", flag:"🇩🇪", tz:"Europe/Berlin" },
-      { name: "Dubái", country:"EAU", flag:"🇦🇪", tz:"Asia/Dubai" },
-      { name: "Mumbai", country:"India", flag:"🇮🇳", tz:"Asia/Kolkata" },
-      { name: "Tokio", country:"Japón", flag:"🇯🇵", tz:"Asia/Tokyo" }
     ];
 
     const grid = document.getElementById('grid');
