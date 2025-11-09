@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reloj mundial</title>
+  <meta name="description" content="Reloj mundial simple y responsive con horas de distintas ciudades." />
+  <style>
+    :root{
+      --bg: #0b1020;
+      --card: #111735;
+      --text: #eaf0ff;
+      --muted: #b5c0e0;
+      --accent: #6aa1ff;
+      --ring: #22306b;
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f6f8ff; --card:#ffffff; --text:#0a0f1f; --muted:#47506a; --accent:#2459ff; --ring:#dfe7ff;
+      }
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 80% -10%, #19306b33, transparent 50%), var(--bg);
+      color:var(--text);
+      display:flex; flex-direction:column; gap:24px;
+    }
+    header{
+      padding:24px clamp(16px, 4vw, 48px) 0;
+    }
+    .title{
+      display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    }
+    .title h1{margin:0; font-size:clamp(22px, 2.8vw, 34px); letter-spacing:.2px}
+    .title small{color:var(--muted)}
+    .controls{margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .chip{border:1px solid var(--ring); color:var(--muted); padding:6px 10px; border-radius:10px; font-size:13px}
+
+    .grid{
+      padding:0 clamp(16px, 4vw, 48px) 32px;
+      display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:16px;
+    }
+    .card{
+      background:linear-gradient(180deg, #ffffff05, transparent 40%), var(--card);
+      border:1px solid var(--ring);
+      border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:10px;
+      box-shadow: 0 10px 20px #00000020;
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+    .card:hover{ transform: translateY(-2px); box-shadow: 0 14px 28px #00000030; border-color:#3a55b455 }
+    .city{ display:flex; align-items:baseline; gap:8px; justify-content:space-between }
+    .city b{ font-size:16px }
+    .flag{ font-size:20px; line-height:1 }
+
+    .time{ font-variant-numeric: tabular-nums; font-size: clamp(24px, 5vw, 36px); font-weight:700 }
+    .date{ color:var(--muted); font-size:13px }
+    .meta{ display:flex; gap:10px; flex-wrap:wrap; align-items:center }
+    .badge{ border:1px dashed var(--ring); border-radius:8px; padding:4px 8px; font-size:12px; color:var(--muted) }
+
+    footer{ padding:0 clamp(16px, 4vw, 48px) 32px; color:var(--muted); font-size:12px }
+    .hint{ opacity:.9 }
+
+    /* Tiny screens */
+    @media (max-width:360px){
+      .grid{ gap:12px }
+      .card{ padding:12px }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">
+      <h1>🕒 Reloj RuiyaParty Deeeeeeeee</h1>
+    </div>
+    <div class="controls">
+      <span class="chip" id="localLabel">Tu zona horaria: —</span>
+      <span class="chip" id="localNow">—</span>
+    </div>
+  </header>
+
+  <main class="grid" id="grid">
+    <!-- Las tarjetas se generan abajo con JS para mantener el HTML limpio. -->
+  </main>
+
+  <footer>
+Topic: Rohee Fest 2025<br/>
+Time: Nov 8, 2025 07:00 PM Eastern Time (US and Canada)<br/>
+Join Zoom Meeting<br/>
+<a href="https://us02web.zoom.us/j/4418909764?pwd=OXhQcG9UN00xR0NUaWJITG8vZmlVUT09&omn=81877758990">https://us02web.zoom.us/j/4418909764?pwd=OXhQcG9UN00xR0NUaWJITG8vZmlVUT09&omn=81877758990</a>
+Meeting ID: 441 890 9764<br/>
+Passcode: 1d3dET<br/>
+  </footer>
+
+  <script>
+    // Lista de ciudades (IANA time zones)
+    const CITIES = [
+      { name: "Lima", country:"Perú", flag:"🇵🇪", tz:"America/Lima" },
+      { name: "Ciudad de México", country:"México", flag:"🇲🇽", tz:"America/Mexico_City" },
+      { name: "Bogotá", country:"Colombia", flag:"🇨🇴", tz:"America/Bogota" },
+      { name: "Buenos Aires", country:"Argentina", flag:"🇦🇷", tz:"America/Argentina/Buenos_Aires" },
+      { name: "São Paulo", country:"Brasil", flag:"🇧🇷", tz:"America/Sao_Paulo" },
+      { name: "Nueva York", country:"EE. UU.", flag:"🇺🇸", tz:"America/New_York" },
+      { name: "Los Ángeles", country:"EE. UU.", flag:"🇺🇸", tz:"America/Los_Angeles" },
+      { name: "Londres", country:"Reino Unido", flag:"🇬🇧", tz:"Europe/London" },
+      { name: "Madrid", country:"España", flag:"🇪🇸", tz:"Europe/Madrid" },
+      { name: "París", country:"Francia", flag:"🇫🇷", tz:"Europe/Paris" },
+      { name: "Berlín", country:"Alemania", flag:"🇩🇪", tz:"Europe/Berlin" },
+      { name: "Dubái", country:"EAU", flag:"🇦🇪", tz:"Asia/Dubai" },
+      { name: "Mumbai", country:"India", flag:"🇮🇳", tz:"Asia/Kolkata" },
+      { name: "Tokio", country:"Japón", flag:"🇯🇵", tz:"Asia/Tokyo" }
+    ];
+
+    const grid = document.getElementById('grid');
+
+    // Plantilla de tarjeta
+    function cardTemplate(city){
+      const id = city.tz.replace(/\W+/g,'_');
+      return `
+        <article class="card" data-tz="${city.tz}" id="${id}">
+          <div class="city">
+            <b>${city.name} • ${city.country}</b>
+            <span class="flag" aria-hidden="true">${city.flag}</span>
+          </div>
+          <div class="time" data-role="time">--:--:--</div>
+          <div class="date" data-role="date">—</div>
+          <div class="meta">
+            <span class="badge" data-role="offset">UTC±00:00</span>
+            <span class="badge" data-role="abbr">—</span>
+          </div>
+        </article>`;
+    }
+
+    // Crear las tarjetas inicialmente
+    grid.innerHTML = CITIES.map(cardTemplate).join('');
+
+    // Formatters por zona horaria
+    const makeFormatters = tz => ({
+      time: new Intl.DateTimeFormat('es-PE', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12:false }),
+      date: new Intl.DateTimeFormat('es-PE', { timeZone: tz, weekday:'long', day:'2-digit', month:'long', year:'numeric' }),
+      abbr: new Intl.DateTimeFormat('es-PE', { timeZone: tz, timeZoneName:'short' })
+    });
+
+    // Calcula el offset UTC como ±HH:MM
+    function utcOffsetLabel(date, tz){
+      const dtf = new Intl.DateTimeFormat('en-US', { timeZone: tz, timeZoneName: 'longOffset' });
+      const parts = dtf.formatToParts(date);
+      const off = parts.find(p => p.type === 'timeZoneName')?.value || 'UTC±00:00';
+      return off.replace('GMT','UTC');
+    }
+
+    // Actualiza todas las tarjetas
+    function tick(){
+      const now = new Date();
+      CITIES.forEach(c => {
+        const el = document.getElementById(c.tz.replace(/\W+/g,'_'));
+        if(!el) return;
+        const fmt = makeFormatters(c.tz);
+        el.querySelector('[data-role="time"]').textContent = fmt.time.format(now);
+        el.querySelector('[data-role="date"]').textContent = fmt.date.format(now);
+        el.querySelector('[data-role="abbr"]').textContent = fmt.abbr.formatToParts(now).find(p=>p.type==='timeZoneName')?.value || '';
+        el.querySelector('[data-role="offset"]').textContent = utcOffsetLabel(now, c.tz);
+      });
+
+      // Etiquetas superiores (zona local)
+      const localLabel = document.getElementById('localLabel');
+      const localNow = document.getElementById('localNow');
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local';
+      localLabel.textContent = `Tu zona horaria: ${tz}`;
+      localNow.textContent = new Intl.DateTimeFormat('es-PE', { dateStyle:'full', timeStyle:'medium' }).format(now);
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  </script>
+</body>
+</html>
